@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="height=device-height, initial-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Виртуальный пациент</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.3/jquery.mCustomScrollbar.concat.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans|Russo+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.3/jquery.mCustomScrollbar.min.css">
+</head>
+<link rel="stylesheet" href="css/style.css?id=6">
+<link rel="stylesheet" href="css/mobile.css?id=6">
+<link rel="stylesheet" href="css/icofont.min.css">
+<script>
+    var audioPanic;
+    var audioUved;
+    var audioUvedOut;
+    var audioLoaded = false;
+    var a_uvedOutLoading = false;
+    var a_uvedLoading = false;
+    window.onload = function () {
+        audioPanic = new Audio();
+        audioPanic.addEventListener('loadeddata', function () {
+            audioLoaded = true;
+        }, false);
+        audioPanic.src = 'action.mp3';
+        audioUved = new Audio();
+        audioUved.addEventListener('loadeddata',function(){ a_uvedLoading = true; });
+        audioUved.src = 'uved.mp3';
+        audioUvedOut = new Audio();
+        audioUvedOut.addEventListener('loadeddata', function () { a_uvedOutLoading = true; });
+        audioUvedOut.src = 'uved_out.mp3';
+        setTimeout(() => {
+            app.animateCSS(document.getElementById('loader-wrapper'),'fadeOut',function(){
+                $('#loader-wrapper').remove();
+            });
+        }, 1000);
+        app.start();
+    };
+</script>
+<body>
+    <div id="loader-wrapper">
+        <div id="loader"></div>
+
+        <div class="loader-section section-left"></div>
+        <div class="loader-section section-right"></div>
+
+    </div>
+    <div id="panicBG" class="panicBG animated d-none" style="position: absolute;width: 100%;height: 100%;background: #5f1d1d;"></div>
+    <div style="width: 100vw;height: 100vh;overflow: hidden;position: absolute;" id="scene_change_wrap">
+        <div class="left-layer"></div>
+        <div class="left-layer left-layer--2"></div>
+        <div class="left-layer left-layer--3"></div>
+        <div class="left-layer left-layer--4"></div>
+    </div>
+    <div class="wrapper-page" >
+        <div class="container" id="wrap">
+            <div class="scene-wrap" id="gameScene">
+                <div class="scene office d-none" data-scene="office">
+                    <div class="outer-menu d-none" id="mobile-menu-scene">
+                        <input class="checkbox-toggle" type="checkbox" />
+                        <div class="hamburger">
+                            <div></div>
+                        </div>
+                        <div class="menu">
+                            <div>
+                                <div>
+                                    <ul>
+                                        <li><a href="#" onclick="officeScene.anamnezInfo.open()">Жалобы и анамнез</a></li>
+                                        <li><a href="#" onclick="officeScene.openFizikal()">Физикальное обследование</a></li>
+                                        <li><a href="#" onclick="officeScene.instrumentalWin.open()">Инструментальные исследования</a></li>
+                                        <li><a href="#" onclick="officeScene.labWin.open()">Лабороторные исследования</a></li>
+                                        <li><a href="#" onclick="officeScene.goToHall()">Результаты исследований</a></li>
+                                        <li><a href="#" onclick="officeScene.diagnozWin.open()">Диагноз</a></li>
+                                        <li><a href="#" onclick="officeScene.therapyBox.open()">Лечение</a></li>
+                                        <li><a href="#" onclick="officeScene.resultBox.open()">Завершить случай</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat d-none">
+                        <div class="chat-title">
+                            <h1>Иван Иваненко</h1>
+                            <h2>Пенсионер</h2>
+                            <figure class="avatar">
+                                <img src="img/avatar.jpg" /></figure>
+                        </div>
+                        <div class="messages">
+                            <div class="messages-content"></div>
+                        </div>
+                        <div class="message-box d-none">
+                            <textarea type="text" class="message-input" placeholder="Type message..."></textarea>
+                            <button type="submit" class="message-submit">Send</button>
+                        </div>
+                
+                    </div>
+                
+                    <div class="select-box-wrapper">
+                        <div class="toggle-msg-box" onclick="officeScene.toggleSelectContainer()">
+                            <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
+                            y="0px" width="100%" height="100%" viewBox="0 0 451.847 451.847"
+                            style="fill: #ffffff;" xml:space="preserve">
+                            <path d="M225.923,354.706c-8.098,0-16.195-3.092-22.369-9.263L9.27,151.157c-12.359-12.359-12.359-32.397,0-44.751
+                        		c12.354-12.354,32.388-12.354,44.748,0l171.905,171.915l171.906-171.909c12.359-12.354,32.391-12.354,44.744,0
+                        		c12.365,12.354,12.365,32.392,0,44.751L248.292,345.449C242.115,351.621,234.018,354.706,225.923,354.706z" />
+                        </svg></div>
+                        <div class="select-box-container" id="selectBox"></div>
+                    </div>
+                    <div class="office-menu d-none">
+                        <button type="button" class="button-3d blue" onclick="officeScene.anamnezInfo.open()">Жалобы и анамнез<div class="counter" id="logNotify"></div></button>
+                        <button type="button" class="button-3d blue" onclick="officeScene.openFizikal()" >Физикальное обследование</button>
+                        <button type="button" class="button-3d blue" onclick="officeScene.instrumentalWin.open()">Инструментальные исследования</button>
+                        <button type="button" class="button-3d blue" onclick="officeScene.labWin.open()">Лабороторные исследования</button>
+                        <button type="button" class="button-3d yellow" onclick="officeScene.goToHall()">Результаты исследований</button>
+                        <button type="button" class="button-3d green" onclick="officeScene.diagnozWin.open()">Диагноз</button>
+                        <button type="button" class="button-3d green" onclick="officeScene.therapyBox.open()">Лечение</button>
+                        <button type="button" class="button-3d red disabled" id="btn_finish" onclick="officeScene.resultBox.open()">Завершить случай</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-wrapper d-none" id="introBox">
+            <div class="modal-container">
+                <div class="modal-header">
+                    <div class="modal-header_title">
+                        <h4>Здравствуйте, доктор!</h4>
+                    </div>
+                    <div class="modal-header_nav"><button class="circle_close gray" onclick="officeScene.startAndShow()"></button></div>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-body_content">
+                <p>Пациент N
+                </p><br>
+                <h3>Диагноз</h3>
+                <p>Острый трансмуральный инфаркт миокарда. </p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="button-3d blue" style="font-size: 20px;"
+                        onclick="officeScene.startAndShow()">Далее</button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-wrapper d-none" id="examinationBox">
+            <div class="modal-container">
+                <div class="modal-header">
+                    <div class="modal-header_title">
+                        <h4>Проведены обследования у пациента</h4>
+                    </div>
+                    <div class="modal-header_nav"></div>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-body_content">
+                        <fieldset class="tasks-list">
+                            <label class="tasks-list-item">
+                                <input type="checkbox" name="ex_1" value="Осмотр" data-need class="tasks-list-cb">
+                                <span class="tasks-list-mark"></span>
+                                <span class="tasks-list-desc">Осмотр</span>
+                                <span class="tasks-list-desc succes-ex d-none" data-res> Верно </span>
+                                <span class="tasks-list-desc wrong-ex d-none" data-res> Не выполнено </span>
+                            </label>
+                            <label class="tasks-list-item">
+                                <input type="checkbox" name="ex_2" value="Измерение АД" data-need class="tasks-list-cb">
+                                <span class="tasks-list-mark"></span>
+                                <span class="tasks-list-desc">Измерение АД</span>
+                                <span class="tasks-list-desc succes-ex d-none" data-res> Верно </span>
+                                <span class="tasks-list-desc wrong-ex d-none" data-res> Не выполнено </span>
+                            </label>
+                            <label class="tasks-list-item">
+                                <input type="checkbox" name="ex_3" value="Глюкометрия" class="tasks-list-cb">
+                                <span class="tasks-list-mark"></span>
+                                <span class="tasks-list-desc">Глюкометрия</span>
+                                <span class="tasks-list-desc succes-ex d-none" data-res> Верно </span>
+                                <span class="tasks-list-desc wrong-ex d-none" data-res> Х </span>
+                            </label>
+                            <label class="tasks-list-item">
+                                <input type="checkbox" name="ex_4" value="Электрокардиография" data-need class="tasks-list-cb">
+                                <span class="tasks-list-mark"></span>
+                                <span class="tasks-list-desc">Электрокардиография</span>
+                                <span class="tasks-list-desc succes-ex d-none" data-res> Верно </span>
+                                <span class="tasks-list-desc wrong-ex d-none" data-res> Не выполнено </span>
+                            </label>
+                            <label class="tasks-list-item">
+                                <input type="checkbox" name="ex_5" value="Пульсоксиметрия" data-need class="tasks-list-cb">
+                                <span class="tasks-list-mark"></span>
+                                <span class="tasks-list-desc">Пульсоксиметрия</span>
+                                <span class="tasks-list-desc succes-ex d-none" data-res> Верно </span>
+                                <span class="tasks-list-desc wrong-ex d-none" data-res> Не выполнено </span>
+                            </label>
+                            <label class="tasks-list-item">
+                                <input type="checkbox" name="ex_6" value="Экспресс-тест на тропонины" data-need class="tasks-list-cb">
+                                <span class="tasks-list-mark"></span>
+                                <span class="tasks-list-desc">Экспресс-тест на тропонины</span>
+                                <span class="tasks-list-desc succes-ex d-none" data-res> Верно </span>
+                                <span class="tasks-list-desc wrong-ex d-none" data-res> Не выполнено </span>
+                            </label>
+                        </fieldset>
+                        <div style="text-align: center;">
+                            <button type="button" data-btn="reset" class="button-3d d-none" style="font-size: 20px;"
+                                onclick="officeScene.examinationBox.reset()">СБРОСИТЬ</button>
+                        </div>
+        
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="button-3d blue" style="font-size: 20px;"
+                        onclick="officeScene.examinationBox.check()">Проверить</button>
+                    <button type="button" class="button-3d blue" style="font-size: 20px;"
+                        onclick="officeScene.examinationBox.next()">Далее</button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-wrapper d-none" id="therapyHBox">
+            <div class="modal-container">
+                <div class="modal-header">
+                    <div class="modal-header_title">
+                        <h4>Назначено лечение у пациента</h4>
+                    </div>
+                    <div class="modal-header_nav"></div>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-body_content">
+                        <fieldset class="tasks-list">
+                            <label class="tasks-list-item">
+                                <input type="checkbox" name="th_1" value="Нитроглицерин" data-need class="tasks-list-cb">
+                                <span class="tasks-list-mark"></span>
+                                <span class="tasks-list-desc">Нитроглицерин</span>
+                                <span class="tasks-list-desc succes-ex d-none" data-res> Верно </span>
+                                <span class="tasks-list-desc wrong-ex d-none" data-res> Не выполнено </span>
+                            </label>
+                            <label class="tasks-list-item">
+                                <input type="checkbox" name="th_2" value="Морфин" data-need class="tasks-list-cb">
+                                <span class="tasks-list-mark"></span>
+                                <span class="tasks-list-desc">Морфин</span>
+                                <span class="tasks-list-desc succes-ex d-none" data-res> Верно </span>
+                                <span class="tasks-list-desc wrong-ex d-none" data-res> Не выполнено </span>
+                            </label>
+                            <label class="tasks-list-item">
+                                <input type="checkbox" name="th_3" value="Гепарин" data-need class="tasks-list-cb">
+                                <span class="tasks-list-mark"></span>
+                                <span class="tasks-list-desc">Гепарин</span>
+                                <span class="tasks-list-desc succes-ex d-none" data-res> Верно </span>
+                                <span class="tasks-list-desc wrong-ex d-none" data-res> Х </span>
+                            </label>
+                            <label class="tasks-list-item">
+                                <input type="checkbox" name="th_4" value="Ацетилсалициловая кислота" data-need class="tasks-list-cb">
+                                <span class="tasks-list-mark"></span>
+                                <span class="tasks-list-desc">Ацетилсалициловая кислота</span>
+                                <span class="tasks-list-desc succes-ex d-none" data-res> Верно </span>
+                                <span class="tasks-list-desc wrong-ex d-none" data-res> Не выполнено </span>
+                            </label>
+                            <label class="tasks-list-item">
+                                <input type="checkbox" name="th_5" value="Фортелизин" data-need class="tasks-list-cb">
+                                <span class="tasks-list-mark"></span>
+                                <span class="tasks-list-desc">Фортелизин</span>
+                                <span class="tasks-list-desc succes-ex d-none" data-res> Верно </span>
+                                <span class="tasks-list-desc wrong-ex d-none" data-res> Не выполнено </span>
+                            </label>
+                            <label class="tasks-list-item">
+                                <input type="checkbox" name="th_6" value="Клопидогрел" data-need class="tasks-list-cb">
+                                <span class="tasks-list-mark"></span>
+                                <span class="tasks-list-desc">Клопидогрел</span>
+                                <span class="tasks-list-desc succes-ex d-none" data-res> Верно </span>
+                                <span class="tasks-list-desc wrong-ex d-none" data-res> Не выполнено </span>
+                            </label>
+                            <label class="tasks-list-item">
+                                <input type="checkbox" name="th_7" value="Метопролол" data-need class="tasks-list-cb">
+                                <span class="tasks-list-mark"></span>
+                                <span class="tasks-list-desc">Метопролол</span>
+                                <span class="tasks-list-desc succes-ex d-none" data-res> Верно </span>
+                                <span class="tasks-list-desc wrong-ex d-none" data-res> Не выполнено </span>
+                            </label>
+                            <label class="tasks-list-item">
+                                <input type="checkbox" name="th_8" value="Нифедипин" class="tasks-list-cb">
+                                <span class="tasks-list-mark"></span>
+                                <span class="tasks-list-desc">Нифедипин</span>
+                                <span class="tasks-list-desc succes-ex d-none" data-res> Верно </span>
+                                <span class="tasks-list-desc wrong-ex d-none" data-res> Не выполнено </span>
+                            </label>
+                            <label class="tasks-list-item">
+                                <input type="checkbox" name="th_9" value="Транексамовая кислота" class="tasks-list-cb">
+                                <span class="tasks-list-mark"></span>
+                                <span class="tasks-list-desc">Транексамовая кислота</span>
+                                <span class="tasks-list-desc succes-ex d-none" data-res> Верно </span>
+                                <span class="tasks-list-desc wrong-ex d-none" data-res> Не выполнено </span>
+                            </label>
+                            <label class="tasks-list-item">
+                                <input type="checkbox" name="th_10" value="Анальгин" class="tasks-list-cb">
+                                <span class="tasks-list-mark"></span>
+                                <span class="tasks-list-desc">Анальгин</span>
+                                <span class="tasks-list-desc succes-ex d-none" data-res> Верно </span>
+                                <span class="tasks-list-desc wrong-ex d-none" data-res> Не выполнено </span>
+                            </label>
+                        </fieldset>
+                        <div style="text-align: center;">
+                            <button type="button" data-btn="reset" class="button-3d d-none" style="font-size: 20px;"
+                                onclick="officeScene.therapyHBox.reset()">СБРОСИТЬ</button>
+                        </div>
+        
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="button-3d blue" style="font-size: 20px;"
+                        onclick="officeScene.therapyHBox.check()">Проверить</button>
+                    <button type="button" class="button-3d blue" style="font-size: 20px;"
+                        onclick="officeScene.therapyHBox.next()">Далее</button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-wrapper d-none" id="finalHBox">
+            <div class="modal-container">
+                <div class="modal-header">
+                    <div class="modal-header_title">
+                        <h4>Результат</h4>
+                    </div>
+                    <div class="modal-header_nav"></div>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-body_content">
+                        <h3>Пациент N</h3>
+                        <p>Случай скорой помощи</p>
+                        <h3 style="margin-top: 20px;">Диагноз пациента</h3>
+                        <p>Острый трансмуральный инфаркт миокарда</p>
+                        <h3 style="margin-top: 20px;">Обследование</h3>
+                        <div data-block="ex"></div>
+                        <h3 style="margin-top: 20px;">Лечение</h3>
+                        <div data-block="th"></div>
+                        <h3>Ссылки на нормативные документы</h3>
+                        <div>
+                            <a href="https://www.garant.ru/products/ipo/prime/doc/71352398/">https://www.garant.ru/products/ipo/prime/doc/71352398/</a>
+                        </div>
+                        <div><a href="https://cr.minzdrav.gov.ru/">https://cr.minzdrav.gov.ru/</a></div>
+                        <div><a href="https://docs.cntd.ru/document/436733768">https://docs.cntd.ru/document/436733768</a></div>
+                        <div style="text-align: center;margin-top: 20px;">
+                            <button class="btn-flat">Запросить КЭК</button>
+                        </div>
+        
+        
+        
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="button-3d blue" style="font-size: 20px;"
+                        onclick="location.reload()">Заново</button>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+    </div>
+    <div id="orinetation-alert">
+        <div class="orinet-alert_content">
+            <div class="device_img">
+                <img src="img/rotate_device_white.png" alt="">
+            </div>
+            <div class="orient-alert_message">
+                Пожайлуста, используйте портретную ориентацию устройства
+            </div>
+
+        </div>
+    </div>
+</body>
+<script src="js/app.js?id=8"></script>
+<script>
+    let sceneWrapper = document.getElementById('wrap')
+    let mainScene = document.getElementById('gameScene');
+    const ratioH = 9/16;
+    const ratioW = 16/9;
+    app.IS_DESKTOP = device.desktop();
+    function resizeScene() {
+        let csWrap = window.getComputedStyle(sceneWrapper);
+        let csScene = window.getComputedStyle(mainScene);
+        let newH = Math.round(parseInt(csWrap.width) * ratioH);
+        let newW = Math.round(parseInt(csWrap.height) * ratioW);
+        if(newH>parseInt(csWrap.height)){
+            mainScene.style.width = Math.round(parseInt(csWrap.height) * ratioW) + 'px';
+            mainScene.style.height = csWrap.height;
+        } else {
+            mainScene.style.height = newH + 'px';
+            mainScene.style.width = csWrap.width;
+        }
+
+        return;
+        var cs = window.getComputedStyle(mainScene);
+        ratio = 9 / 16;
+        mainScene.style.height = Math.round(parseInt(cs.width) * ratio) + 'px';
+    };
+    if(device.desktop()){
+        window.addEventListener("resize", resizeScene);
+        resizeScene();
+    } else {
+        let wrap = document.getElementById('scene_change_wrap');
+        wrap.parentNode.removeChild(wrap);
+    }
+</script>
+</html>
