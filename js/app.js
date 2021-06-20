@@ -60,14 +60,7 @@ officeScene.domScene = document.querySelector('[data-scene="office"]');
 officeScene.introInfo = new infoBox(document.getElementById('introBox'));
 
 officeScene.examinationBox = (function(){
-    let _result = {
-        "ex_1": { needCheck: true ,isChecked: false},
-        "ex_2": { needCheck: true, isChecked: false},
-        "ex_3": { needCheck: false, isChecked: false},
-        "ex_4": { needCheck: true, isChecked: false},
-        "ex_5": { needCheck: true, isChecked: false},
-        "ex_6": { needCheck: true, isChecked: false},
-    }
+    let _result = {}
     let _dom = document.getElementById('examinationBox');
     let _modal = new infoBox(_dom);
     let allCB = _dom.querySelectorAll('input[type="checkbox"]');
@@ -208,14 +201,15 @@ officeScene.finalBox = (function(){
             let styleText = '';
             let flag = (resultTH[key].isChecked == resultTH[key].needCheck);
             if (!resultTH[key].isChecked && flag) styleText = 'text-decoration: line-through;'
-            let txtInfo = (flag)?'Верно':'Не верно';
+            let txtInfo = (flag) ? 'Верно' :'Не назначено';
+            if(!resultTH[key].needCheck && resultTH[key].isChecked) txtInfo = 'Не верно';
             blockTh.innerHTML += getHtmlResult(resultTH[key].value, flag, txtInfo,styleText);
         }
         for(key in resultEX){
             let styleText = '';
             let flag = (resultEX[key].isChecked == resultEX[key].needCheck);
             if (!resultEX[key].isChecked && flag) styleText = 'text-decoration: line-through;';
-            let txtInfo = (flag) ? 'Верно' : 'Не верно';
+            let txtInfo = (flag) ? 'Верно' : 'Не выполнено';
             if(key == 'ex_3' && !flag) txtInfo = 'Лишнее исследование';
             blockEx.innerHTML += getHtmlResult(resultEX[key].value, flag, txtInfo, styleText);
         }
